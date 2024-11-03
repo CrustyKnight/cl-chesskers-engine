@@ -8,7 +8,7 @@
 
 
                                         ;(declaim (optimize (speed 3) (safety 0)))
-(declaim (optimize (speed 0) (safety 3)))
+(declaim (optimize (speed 3) (safety 0)))
 (defun squarep (thing)
   (and (consp thing)
        (numberp (car thing))
@@ -423,7 +423,7 @@
                  (format nil "C,C,None,~a,~a~%" (game-turn game) (game-color game))
                  (format nil "~{~{~a~^ ~}~^~%~}" board))))
 (defun read-board (string)
-  (let* ((split-string (uiop:split-string string :separator '(#\Newline #\ )))
+  (let* ((split-string (remove-if #'(lambda (str) (string= "" str)) (uiop:split-string string :separator '(#\Newline #\ ))))
          (chars (cdr split-string))
          (data (uiop:split-string (car split-string) :separator ","))
          (turn (parse-integer (fourth data)))
@@ -512,3 +512,26 @@
             (setf bot-move (find-best-move game depth))
             (format t "I'll go ~a~%" (move->ucn bot-move))
             (game-move game bot-move)))))
+
+(defun read-board-and-evaluate-for-machines ()
+  (let ((game
+          (-<>> (loop for line = (read-line)
+                      if (string= "quit" line)
+                        do (return-from read-board-and-evaluate-for-machines 0)
+                      while (not (string= "" line))
+                      collecting line)
+            (format nil "~{~a~^~%~}" <>)
+            read-board))
+        (depth (parse-integer (read-line))))
+    (format t "~a" (move->ucn (find-best-move game depth)))))
+
+;; (defun for-python-as-subprocess ()
+;;   (loop (read-board-and-evaluate-for-machines)))
+;; (defun for-python-as-subprocess ()
+;;   (loop
+;;     do (read-board-and-evaluate-for-machines)
+;;     when (string= (read-line) "quit")
+;;       return nil))
+
+(defun for-python-as-subprocess ()
+  (read-board-and-evaluate-for-machines))
