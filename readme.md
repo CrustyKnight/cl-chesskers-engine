@@ -9,3 +9,7 @@ play-chesskers will put you into a more human friendly program which will allow 
 
 chesskers-computer-executable will expect a board representation and a depth entered (with an empty line separating them)
 and will then print out the best move for the current player and exit.
+
+
+# TODO
+- Add support for castling, en-passant, and checkmate/end of game
