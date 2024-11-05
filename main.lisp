@@ -273,7 +273,6 @@
         (4 (rook))
         (5 (queen))
         (6 (king))))))
-;; TODO add promotion step & jump
 
 (defun new-queen-context (jump)
   (declare (type game-jump jump))
@@ -295,13 +294,12 @@
         (=one (car (game-jump-land jump)) 0 7)
         (not (= (car (game-jump-taken jump)) (car (game-jump-land jump)))))))
 (defun square-jumps-recursive (game square &optional (start t) (qctx nil))
-  ;; TODO add check so after jumping over edge can't keep jumping
   (let ((jumps (square-jumps game square start qctx)))
     (if (= 0 (length jumps))
         (return-from square-jumps-recursive '()))
     (labels ((next-level (jump)
                (declare (type game-jump jump))
-               (if (edge-jump-p jump) (return-from next-level '()))
+               (if (or (edge-jump-p jump) (game-promotion-jump-p jump)) (return-from next-level '()))
                (let ((ng (copy-game game))
                      (qctx (new-queen-context jump)))
                  (game-do-jump ng jump)
@@ -327,7 +325,6 @@
     (loop for square in squares
           nconcing (square-moves game square))))
 
-;; TODO do testing
 
 ;;; Bot Stuff
 
